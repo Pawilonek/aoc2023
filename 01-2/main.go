@@ -28,6 +28,9 @@ func getFirstAndLastNumber(line string) (int, int) {
 	for i := 0; i < len(line); i++ {
 		number, err := strconv.Atoi(string(line[i]))
 		if err == nil {
+			// Reset all found letters
+			foundNumberNames = map[int]int{}
+
 			if first < 0 {
 				first = number
 			}
@@ -45,7 +48,7 @@ func getFirstAndLastNumber(line string) (int, int) {
 			}
 
 			// Run out of letters in a number - should not happen
-			if len(nameOfANumber) < position {
+			if len(nameOfANumber) <= position {
 				foundNumberNames[intValue] = 0
 
 				continue
@@ -57,7 +60,16 @@ func getFirstAndLastNumber(line string) (int, int) {
 			if expectedLetter != line[i] {
 				foundNumberNames[intValue] = 0
 
-				continue
+				// Make sure it's not a beggining of a new number
+				if position == 0 {
+					continue
+				}
+
+				position = 0
+				expectedLetter := nameOfANumber[position]
+				if expectedLetter != line[i] {
+					continue
+				}
 			}
 
 			// Check if we fount the number
@@ -69,9 +81,8 @@ func getFirstAndLastNumber(line string) (int, int) {
 
 				last = intValue
 
-				break
+				continue
 			}
-
 			foundNumberNames[intValue] = position + 1
 		}
 	}
